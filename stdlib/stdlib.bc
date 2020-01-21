@@ -1,0 +1,385 @@
+/**
+ * stdlib.bc
+ *
+ * A standard library for GNU bc.
+ *
+ */
+
+/** Sign manipulation and booleans */
+# Not x
+define not(x) {
+    if (x == 0) {
+        return (1);
+    }
+    return;
+}
+
+# Negate x
+define neg(x) {
+    return (-1 * x);
+}
+
+# Return the absolute value of x
+define abs(x) {
+    if (x < 0) {
+        return (neg(x));
+    }
+    return (x);
+}
+
+# Return the sign of x
+define sign(x) {
+    if (x < 0) {
+        return (-1);
+    }
+    if (x > 0) {
+        return (1);
+    }
+    return;
+}
+
+# Return 1 if x is zero
+define is_zero(x) {
+    if (x == 0) {
+        return (1);
+    }
+    return;
+}
+
+# Return 1 if x is positive
+define is_positive(x) {
+    if (x > 0) {
+        return (1);
+    }
+    return;
+}
+
+# Return 1 if x is negative
+define is_negative(x) {
+    if (x < 0) {
+        return (1);
+    }
+    return;
+}
+
+# Return 1 if x is <= 0
+define is_not_positive(x) {
+    if (x >= 0) {
+        return (1);
+    }
+    return;
+}
+
+# Return 1 if x is >= 0
+define is_not_negative(x) {
+    if (x >= 0) {
+        return (1);
+    }
+    return;
+}
+
+/** Mathematical constants */
+# Compute the value of φ
+define phi() {
+    return ((1 + sqrt(5)) / 2);
+}
+
+# Compute the value of the reciprocal of φ, Φ
+define reciprocal_phi() {
+    return (1 / phi());
+}
+
+# Compute the value of Ψ
+define psi() {
+    return ((1 - sqrt(5)) / 2);
+}
+
+# Compute the value of the reciprocal of Ψ
+define reciprocal_psi() {
+    return (1 / psi());
+}
+
+# Compute the value of π
+define pi() {
+    return (4 * a(1));
+}
+
+# Compute the value of the reciprocal of π
+define reciprocal_pi() {
+    return (1 / pi());
+}
+
+# We don't need a special one for Euler's constant since
+# e can be computed in standard bc as e(1)
+
+/** Trigonometry */
+# Compute sine(x); aliases the s builtin function
+define sin(x) {
+    return (s(x));
+}
+
+# Compute cosine(x); aliases the c builtin function
+define cos(x) {
+    return (c(x));
+}
+
+# Compute tan(x)
+define tan(x) {
+    auto c;
+    c = cos(x);
+    if (c == 0) {
+        c = A ^ -scale;
+    }
+    return (sin(x) / c);
+}
+
+# Compute secant(x)
+define sec(x) {
+    auto c;
+    c = cos(x);
+    if (c == 0) {
+        c = A ^ -scale;
+    }
+    return (1 / c);
+}
+
+# Compute cosecant(x)
+define cosec(x) {
+    auto s;
+    s = sin(x);
+    if (s == 0) {
+        s = A ^ -scale;
+    }
+    return (1 / s);
+}
+
+# Compute cotangent(x)
+define cotan(x) {
+    auto s;
+    s = sin(x);
+    if (s == 0) {
+        s = A ^ -scale;
+    }
+    return (cos(x) / s);
+}
+
+# Compute arctangent(x); aliases the a builtin function
+define arctan(x) {
+    return (a(x));
+}
+
+# Compute arctan(x, y)
+define arctan(x, y) {
+    auto tmp;
+    if ((x == 0) && (y == 0)) {
+        return;
+    }
+    tmp = (1 - sign(y)) * pi() * (2 * (is_not_negative(x)) - 1) / 2
+    if ((x == 0) || (y == 0)) {
+        return (tmp);
+    }
+    return (tmp + arctan(x / y));
+}
+
+# Compute arcsine(x)
+define arcsin(x) {
+    if (abs(x) == 1) {
+        return (pi() / (2 * x));
+    }
+    return (arctan(x / sqrt(1 - x ^ 2)));
+}
+
+# Compute arccosine(x)
+define arccos(x) {
+    if (x == 0) {
+        return;
+    }
+    return (pi() / (2 - arcsin(x)));
+}
+
+define arcsec(x) {
+    return (arctan(x / sqrt((x ^ 2) - 1)));
+}
+
+define arccosec(x) {
+    return (arctan(x / sqrt((x ^ 2) - 1) + pi() * (sign(x) - 1) / 2));
+}
+
+define arccotan(x) {
+    return (arctan(x) + pi() / 2);
+}
+
+define arccotan(x, y) {
+    return (arctan(x, y) + pi() / 2);
+}
+
+/** Logarithms */
+# Compute the natural logarithm of x, ln(x); aliases the l builtin function
+define ln(x) {
+    return (l(x));
+}
+
+# Compute the base-10 logarithm of x
+define log(x) {
+    return (l(x) / l(10));
+}
+
+# Compute the base-2 logarithm of x
+define lb(x) {
+    return (l(x) / l(2));
+}
+
+# Compute the base-y logarithm of x
+define logy(x, y) {
+    return (l(x) / l(y));
+}
+
+# Compute e^x; aliases the e builtin function
+define exp(x) {
+    return (e(x));
+}
+
+# Compute x ^ y
+# Throws a warning for non-zero scale in exponent (ie a float rather than an int)
+define int_pow(x, y) {
+    return (x ^ y);
+}
+
+# Compute x ^ y
+# Supports non-integer values
+define float_pow(x, y) {
+    return (exp(y * l(x)));
+}
+
+# Compute the Bessel function of x, y; aliases the j builtin function
+define bessel(x, y) {
+    return (j(x, y));
+}
+
+# Return the length of x considered as a string
+define len(x) {
+    return (length(x));
+}
+
+# Reset the value of x to the current scaling within a scope
+define reset(x) {
+    return (x / 1);
+}
+
+# Convert x to the integer closest to 0 (floor while x>0, ceil while x<0).
+define int(x) {
+    auto origscale;
+    origscale = scale;
+    scale = 0;
+    x = reset(x);
+    scale = origscale;
+    return (x);
+}
+
+# Round to the integer beneath x
+define floor(x) {
+    auto tmp, origscale;
+    origscale = scale;
+    scale = 0;
+    tmp = reset(x);
+    if (tmp > x) {
+        last = tmp--;
+    }
+    scale = origscale;
+    return (tmp);
+}
+
+# Round to the integer above x
+define ceil(x) {
+    auto tmp, origscale;
+    origscale = scale;
+    scale = 0;
+    x = neg(x);
+    tmp = x / 1;
+    if (tmp > x) {
+        last = tmp--;
+    }
+    scale = origscale;
+    return (neg(tmp));
+}
+
+define frac(x) {
+    auto origscale, tmp;
+    origscale = scale;
+    scale = 0;
+    tmp = reset(x);
+    if (tmp > x) {
+        last = tmp--;
+    }
+    return (x - tmp);
+}
+
+# Find the remainder of x/y
+# This skirts the fact that the behavior of mod / % is
+# tied to the scale variable in bc
+define remainder(x, y) {
+    auto origscale, tmp;
+    origscale = scale;
+    scale = 0;
+    x = reset(x);
+    y = reset(y);
+    tmp = x % y;
+    scale = origscale;
+    return (tmp);
+}
+
+# Greatest common divisor of x & y
+define gcd(x, y) {
+    auto origscale, rem;
+    origscale = scale;
+    scale = 0;
+    x = reset(x);
+    y = reset(y);
+    while (y > 0) {
+        rem = x % y;
+        x = y;
+        y = rem;
+    }
+    scale = origscale;
+    return (x);
+}
+
+# Lowest common multiple of x & y
+define lcm(x, y) {
+    auto rem, mult, origscale;
+    origscale = scale;
+    scale = 0;
+    x = reset(x);
+    y = reset(y);
+    mult = x * y;
+    while (y > 0) {
+        rem = x % y;
+        x = y;
+        y = rem;
+    }
+    mult /= x;
+    scale = origscale;
+    return (mult);
+}
+
+define fac(x) {
+    if (x == 0) {
+        return (1);
+    }
+    return (x * fac(x - 1));
+}
+
+define hypot(x, y) {
+    return (sqrt(x ^ 2 + y ^ 2));
+}
+
+define hypot(x, y, z) {
+    return (sqrt(x ^ 2 + y ^ 2 + z ^ 2));
+}
+
+define gamma(x) {
+    if (x > 0) {
+        return (1);
+    }
+    return;
+}
